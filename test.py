@@ -23,11 +23,11 @@ import cv2
 
 
 # load the input image and resize it to the target spatial dimensions
-fn = "90-10241990_1984-11-28_2007.jpg"
+fn = "90-102690_1966-09-09_2011.jpg"
 image = cv2.imread("test/"+fn)
 (height, width) = image.shape[:2]
 output = image.copy()
-# image = cv2.resize(image, (args["width"], args["height"]))
+image = cv2.resize(image, (64, 64))
  
 # scale the pixel values to [0, 1]
 image = image.astype("float") / 255.0
@@ -38,14 +38,13 @@ image = image.astype("float") / 255.0
 # 	image = image.flatten()
 # 	image = image.reshape((1, image.shape[0]))
 
-image = image.flatten()
-image = image.reshape((1, image.shape[0]))
+# image = image.flatten()
+# image = image.reshape((1, image.shape[0]))
  
 # otherwise, we must be working with a CNN -- don't flatten the
 # image, simply add the batch dimension
 # else:
-# 	image = image.reshape((1, image.shape[0], image.shape[1],
-# 		image.shape[2]))
+image = image.reshape((1, image.shape[0], image.shape[1], image.shape[2]))
 
 print("[INFO] loading network and label binarizer...")
 model = load_model("model.model")
@@ -68,20 +67,39 @@ scale = 1
 
 output_rotated = output
 
+print(text)
+
+scale_text = 0.4
+pos_text = (3,13)
+color_text = (255,255,255)
+# color_text = (0,0,255)
 if label == 'rotated_left':
 	M = cv2.getRotationMatrix2D(center, -90, scale)
 	output_rotated = cv2.warpAffine(output, M, (height, width))
+	text = "{}: {:.1f}%".format("L", preds[0][i] * 100)
+	cv2.putText(output, text, pos_text, cv2.FONT_HERSHEY_SIMPLEX, scale_text,
+		color_text, 1)
 elif label == 'rotated_right':
 	M = cv2.getRotationMatrix2D(center, 90, scale)
 	output_rotated = cv2.warpAffine(output, M, (height, width))
+	text = "{}: {:.1f}%".format("R", preds[0][i] * 100)
+	cv2.putText(output, text, pos_text, cv2.FONT_HERSHEY_SIMPLEX, scale_text,
+		color_text, 1)
 elif label == 'upside_down':
 	M = cv2.getRotationMatrix2D(center, 180, scale)
 	output_rotated = cv2.warpAffine(output, M, (height, width))
+	text = "{}: {:.1f}%".format("D", preds[0][i] * 100)
+	cv2.putText(output, text, pos_text, cv2.FONT_HERSHEY_SIMPLEX, scale_text,
+		color_text, 1)
+else:
+	text = "{}: {:.1f}%".format("U", preds[0][i] * 100)
+	cv2.putText(output, text, pos_text, cv2.FONT_HERSHEY_SIMPLEX, scale_text,
+		color_text, 1)
 
-print(text)
+
 # show the output image
 # cv2.imshow("Image", output)
-# cv2.imwrite("image.png", output)
+cv2.imwrite("image.png", output)
 cv2.imwrite("image_corrected.png", output_rotated)
 # cv2.waitKey(0)
 

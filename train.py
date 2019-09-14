@@ -4,6 +4,7 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 
+from keras.preprocessing.image import ImageDataGenerator
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelBinarizer
@@ -11,6 +12,7 @@ from model import Model
 # from model import model
 
 EPOCHS = 75
+BS = 64
 
 def load_data_and_labels(fn):
 	#initialize data and labels
@@ -19,7 +21,8 @@ def load_data_and_labels(fn):
 	labels = []
 	cont = 0
 	for row in csv.DictReader(open(fn)):
-		img = cv2.imread("train/"+row['fn']).flatten()
+		img = cv2.imread("train/"+row['fn'])
+		# img = cv2.imread("train/"+row['fn']).flatten()
 		data.append(img)
 		labels.append(row['label'])
 		if cont == 3000:
@@ -38,12 +41,20 @@ lb = LabelBinarizer()
 trainY = lb.fit_transform(trainY)
 testY = lb.transform(testY)
 
+aug = ImageDataGenerator(rotation_range=30, width_shift_range=0.1,
+	height_shift_range=0.1, shear_range=0.2, zoom_range=0.2,
+	horizontal_flip=True, fill_mode="nearest")
+
 model = Model.build(len(lb.classes_))
 # print(trainY)
 # print(testY)
 
-H = model.fit(trainX, trainY, validation_data=(testX, testY),
-	epochs=EPOCHS, batch_size=64)
+# H = model.fit(trainX, trainY, validation_data=(testX, testY),
+# 	epochs=EPOCHS, batch_size=64)
+
+H = model.fit_generator(aug.flow(trainX, trainY, batch_size=BS),
+	validation_data=(testX, testY), steps_per_epoch=len(trainX) // BS,
+	epochs=EPOCHS)
 
 # evaluate the network
 print("[INFO] evaluating network...")
