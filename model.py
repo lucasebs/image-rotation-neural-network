@@ -20,7 +20,7 @@ class Model(object):
 	# 	INIT_LR = 0.01
 
 	# 	print("[INFO] training network...")
-	# 	optimizer = SGD(lr=INIT_LR)
+	#	optimizer = SGD(lr=INIT_LR)
 	# 	model.compile(loss="categorical_crossentropy", optimizer=optimizer,
 	# 		metrics=["accuracy"])
 
