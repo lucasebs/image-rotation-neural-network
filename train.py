@@ -22,7 +22,7 @@ ap.add_argument("-l", "--label-bin", required=True,
 args = vars(ap.parse_args())
 
 
-EPOCHS = 50
+EPOCHS = 75
 BS = 64
 
 def load_data_and_labels(fn):
@@ -49,9 +49,13 @@ lb = LabelBinarizer()
 trainY = lb.fit_transform(trainY)
 testY = lb.transform(testY)
 
-aug = ImageDataGenerator(rotation_range=30, width_shift_range=0.1,
-	height_shift_range=0.1, shear_range=0.2, zoom_range=0.2,
-	horizontal_flip=True, fill_mode="nearest")
+# aug = ImageDataGenerator(rotation_range=30, width_shift_range=0.1,
+# 	height_shift_range=0.1, shear_range=0.2, zoom_range=0.2,
+# 	horizontal_flip=True, fill_mode="nearest")
+
+aug = ImageDataGenerator(rotation_range=0, width_shift_range=0.1,
+	height_shift_range=0.1, shear_range=0., zoom_range=0.,
+	horizontal_flip=False, fill_mode="nearest")
 
 model = Model.build(len(lb.classes_))
 
